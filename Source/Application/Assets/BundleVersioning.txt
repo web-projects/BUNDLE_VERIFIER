@@ -1,0 +1,15 @@
+1. CHASE
+   sphere.sphere.consolidated.attended.CHASE..m400.6_8_2_32.230706.230706.tar                                                                
+   sphere.sphere.consolidated.attended.CHASE..p200.6_8_2_32.230706.230706.tar                                                                
+   sphere.sphere.consolidated.attendednopin.CHASE..m400.6_8_2_32.230706.230724.tar                                                           
+   sphere.sphere.consolidated.attendednopin.CHASE..p200.6_8_2_32.230706.230724.tar                                                           
+
+2. FDRC
+   sphere.sphere.consolidated.attended.FD..m400.6_8_2_32.230712.230731.tar                                                                   
+   sphere.sphere.consolidated.attended.FD..p200.6_8_2_32.230712.230731.tar                                                                   
+   sphere.sphere.consolidated.attendednopin.FD..m400.6_8_2_32.230712.230712.tar                                                              
+   sphere.sphere.consolidated.attendednopin.FD..p200.6_8_2_32.230712.230712.tar                                                              
+
+3. TSYS
+   sphere.sphere.consolidated.attended.TSYS..m400.6_8_2_32.230706.230706.tar                                                                 
+   sphere.sphere.consolidated.attended.TSYS..p200.6_8_2_32.230706.230706.tar                                                                 

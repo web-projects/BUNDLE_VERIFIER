@@ -28,10 +28,20 @@ namespace Application.Execution
             Console.WriteLine($"SOURCE: {bundleSchema.BundleSource}\n");
             Logger.info($"SOURCE: {bundleSchema.BundleSource}");
 
+            string sourceFilenamePath = Path.Combine(bundleSchema.SourceDirectory, bundleSchema.BundleSource);
+
+            // Ensure Source exists
+            if (!File.Exists(sourceFilenamePath)) 
+            {
+                Console.WriteLine($"SOURCE: {sourceFilenamePath} - NOT FOUND\n");
+                Logger.info($"SOURCE: {sourceFilenamePath} - NOT FOUND");
+                return;
+            }
+
             // display progress bar
             StartProgressBar();
 
-            ExtractTGZ(Path.Combine(bundleSchema.SourceDirectory, bundleSchema.BundleSource), bundleSchema.WorkingDirectory);
+            ExtractTGZ(sourceFilenamePath, bundleSchema.WorkingDirectory);
 
             StopProgressBar();
 
