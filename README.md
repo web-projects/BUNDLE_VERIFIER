@@ -30,4 +30,4 @@ This an application to Verify Tar Bundles.
    
 ### HISTORY ###
 
-* 202300801 - Initial repository
+* 20230801 - Initial repository
