@@ -102,6 +102,23 @@ namespace Application.Execution
                                 }
                                 string fileToVerify = Path.Combine(targetArchiveDestinationFolder, signatureFile);
                                 string authoritySource = Path.Combine(child.AuthoritySource, signatureFile);
+
+                                // Check file exists in REPO
+                                if (!File.Exists(authoritySource)) 
+                                {
+                                    Console.WriteLine($"  FILE: {Utils.FormatStringAsRequired(authoritySource, filenameSpaceFill, filenameSpaceFillChar)} - NOT FOUND");
+                                    Logger.info($"  FILE: {Utils.FormatStringAsRequired(authoritySource, filenameSpaceFill, filenameSpaceFillChar)} - NOT FOUND");
+                                    continue;
+                                }
+
+                                // Ignore for extensions p7s
+                                if (signatureFile.ToLower().EndsWith("p7s"))
+                                {
+                                    Console.WriteLine($"  FILE: {Utils.FormatStringAsRequired(signatureFile, filenameSpaceFill, filenameSpaceFillChar)} - FOUND");
+                                    Logger.info($"  FILE: {Utils.FormatStringAsRequired(signatureFile, filenameSpaceFill, filenameSpaceFillChar)} - FOUND");
+                                    continue;
+                                }
+
                                 bool fileMatch = File.ReadLines(authoritySource).SequenceEqual(File.ReadLines(fileToVerify));
                                 if (fileMatch)
                                 {
