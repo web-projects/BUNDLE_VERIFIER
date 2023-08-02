@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace BUNDLE_VERIFIER.Config
 {
@@ -7,8 +6,7 @@ namespace BUNDLE_VERIFIER.Config
     {
         public Colors Colors { get; set; }
         public bool EnableColors { get; set; }
-        public string BundlesSource { get; set; }
-        public List<Bundles> Bundles { get; set; }
+        public int ActiveBundleIndex { get; set; }
     }
 
     [Serializable]

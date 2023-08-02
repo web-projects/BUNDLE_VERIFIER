@@ -1,4 +1,5 @@
 ﻿using BUNDLE_VERIFIER.Config;
+using BundleValidator.Config;
 using Common.Execution;
 using Common.Helpers;
 using Common.LoggerManager;
@@ -34,29 +35,29 @@ namespace Application.Execution
 
             StopProgressBar();
 
-            foreach (Bundles bundle in bundleSchema.Bundles)
+            foreach (Packages package in bundleSchema.Packages)
             {
-                bool fileFound = File.Exists(Path.Combine(bundleSchema.WorkingDirectory, bundle.Name));
+                bool fileFound = File.Exists(Path.Combine(bundleSchema.WorkingDirectory, package.Name));
                 if (!fileFound)
                 {
-                    Console.WriteLine($"BUNDLE: {Utils.FormatStringAsRequired(bundle.Name)} - NOT FOUND");
-                    Logger.error($"BUNDLE: {Utils.FormatStringAsRequired(bundle.Name)} - NOT FOUND");
+                    Console.WriteLine($"BUNDLE: {Utils.FormatStringAsRequired(package.Name)} - NOT FOUND");
+                    Logger.error($"BUNDLE: {Utils.FormatStringAsRequired(package.Name)} - NOT FOUND");
                     continue;
                 }
 
-                Console.WriteLine($"BUNDLE: {Utils.FormatStringAsRequired(bundle.Name)} - FOUND");
-                Logger.info($"BUNDLE: {Utils.FormatStringAsRequired(bundle.Name)} - FOUND");
+                Console.WriteLine($"BUNDLE: {Utils.FormatStringAsRequired(package.Name)} - FOUND");
+                Logger.info($"BUNDLE: {Utils.FormatStringAsRequired(package.Name)} - FOUND");
 
                 // Process child bundle: bundle with 'Name' is the target
-                if (bundle.ChildrenBundles?.Count > 0)
+                if (package.ChildrenPackages?.Count > 0)
                 {
-                    string bundleName = bundle.Name;
+                    string bundleName = package.Name;
                     string childBundlePath = string.Empty;
                     string workingDirectory = bundleSchema.WorkingDirectory;
                     string targetArchiveFullPath = string.Empty;
-                    string targetArchiveDestinationFolder = Path.Combine(workingDirectory, bundle.Name.Replace(".tgz", ".dir"));
+                    string targetArchiveDestinationFolder = Path.Combine(workingDirectory, package.Name.Replace(".tgz", ".dir"));
 
-                    foreach (Bundles child in bundle.ChildrenBundles)
+                    foreach (Packages child in package.ChildrenPackages)
                     {
                         if (string.IsNullOrEmpty(childBundlePath))
                         {
@@ -71,7 +72,12 @@ namespace Application.Execution
                         }
 
                         targetArchiveFullPath = Path.Combine(workingDirectory, bundleName);
-                        ExtractTGZ(targetArchiveFullPath, targetArchiveDestinationFolder);
+
+                        // Check for directory since some steps are only validating a file in a different subdirectory
+                        if (!Directory.Exists(targetArchiveDestinationFolder))
+                        {
+                            ExtractTGZ(targetArchiveFullPath, targetArchiveDestinationFolder);
+                        }
 
                         // Found the target bundle
                         if (!string.IsNullOrEmpty(child.Name) && !string.IsNullOrEmpty(child.AuthoritySource))
