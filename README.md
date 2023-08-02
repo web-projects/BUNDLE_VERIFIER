@@ -31,3 +31,4 @@ This an application to Verify Tar Bundles.
 ### HISTORY ###
 
 * 20230801 - Initial repository
+* 20230802 - Added 10 sets of bundle verification processes.

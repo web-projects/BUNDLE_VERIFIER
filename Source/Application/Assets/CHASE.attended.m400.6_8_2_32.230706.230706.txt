@@ -1,0 +1,26 @@
+20230802-11:58:31.549 [i] BundleValidator (1.0.0.0) - LOGGING INITIALIZED.
+20230802-11:58:31.685 [i] SOURCE: sphere.sphere.consolidated.attended.CHASE..m400.6_8_2_32.230706.230706.tar
+20230802-11:58:34.500 [i] BUNDLE: config_hr_mm_ss_reboot-01.00.00.tgz_____ - FOUND
+20230802-11:58:34.503 [i] BUNDLE: config_hr_mm_ss_reboot-01.00.00.tgz.p7s_ - FOUND
+20230802-11:58:34.505 [i] BUNDLE: idleScreen_m400.tgz_____________________ - FOUND
+20230802-11:58:34.505 [i] BUNDLE: idleScreen_m400.tgz.p7s_________________ - FOUND
+20230802-11:58:34.506 [i] BUNDLE: usr1.VIPA_bin.tgz_______________________ - FOUND
+20230802-11:58:34.535 [i]   FILE: vipa_ver.txt         - MATCH
+20230802-11:58:34.536 [i] BUNDLE: usr1.VIPA_cfg.tgz_______________________ - FOUND
+20230802-11:58:34.599 [i]   FILE: #whitelist.dat       - MATCH
+20230802-11:58:34.600 [i]   FILE: cardapp.cfg          - MATCH
+20230802-11:58:34.602 [i]   FILE: mapp.cfg             - MATCH
+20230802-11:58:34.603 [i]   FILE: tdol.cfg             - MATCH
+20230802-11:58:34.604 [i]   FILE: emv_ver.txt          - MATCH
+20230802-11:58:34.604 [i] BUNDLE: usr1.VIPA_cfg_emv.tgz___________________ - FOUND
+20230802-11:58:34.662 [i]   FILE: contl_hints.cfg      - MATCH
+20230802-11:58:34.664 [i]   FILE: contlemv.cfg         - MATCH
+20230802-11:58:34.665 [i]   FILE: iccdata.dat          - MATCH
+20230802-11:58:34.666 [i]   FILE: icckeys.key          - MATCH
+20230802-11:58:34.666 [i] BUNDLE: usr1.VIPA_www.tgz_______________________ - FOUND
+20230802-11:58:34.977 [i]   FILE: display_message.html - MATCH
+20230802-11:58:34.978 [i]   FILE: idle.html            - MATCH
+20230802-11:58:34.979 [i]   FILE: signature.html       - MATCH
+20230802-11:58:34.980 [i]   FILE: verify_amount.html   - MATCH
+20230802-11:58:34.981 [i] BUNDLE: usr1.VIPA_www.tgz_______________________ - FOUND
+20230802-11:58:34.983 [i]   FILE: eng                  - MATCH
