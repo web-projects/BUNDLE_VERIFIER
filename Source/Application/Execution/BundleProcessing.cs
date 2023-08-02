@@ -1,0 +1,162 @@
+﻿using BUNDLE_VERIFIER.Config;
+using Common.Execution;
+using Common.Helpers;
+using Common.LoggerManager;
+using ICSharpCode.SharpZipLib.GZip;
+using ICSharpCode.SharpZipLib.Tar;
+using System;
+using System.IO;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace Application.Execution
+{
+    internal static class BundleProcessing
+    {
+        private const int filenameSpaceFill = 20;
+        private const char filenameSpaceFillChar = ' ';
+        private const int TimeDelay = 1000;
+
+        private static ProgressBar DeviceProgressBar = null;
+        private static int cursorPositionLeft = 0;
+        private static int cursorPositionTop = 0;
+
+        public static void ProcessBundles(BundleSchema bundleSchema)
+        {
+            Console.WriteLine($"SOURCE: {bundleSchema.BundleSource}\n");
+            Logger.info($"SOURCE: {bundleSchema.BundleSource}");
+
+            // display progress bar
+            StartProgressBar();
+
+            ExtractTGZ(Path.Combine(bundleSchema.SourceDirectory, bundleSchema.BundleSource), bundleSchema.WorkingDirectory);
+
+            StopProgressBar();
+
+            foreach (Bundles bundle in bundleSchema.Bundles)
+            {
+                bool fileFound = File.Exists(Path.Combine(bundleSchema.WorkingDirectory, bundle.Name));
+                if (!fileFound)
+                {
+                    Console.WriteLine($"BUNDLE: {Utils.FormatStringAsRequired(bundle.Name)} - NOT FOUND");
+                    Logger.error($"BUNDLE: {Utils.FormatStringAsRequired(bundle.Name)} - NOT FOUND");
+                    continue;
+                }
+
+                Console.WriteLine($"BUNDLE: {Utils.FormatStringAsRequired(bundle.Name)} - FOUND");
+                Logger.info($"BUNDLE: {Utils.FormatStringAsRequired(bundle.Name)} - FOUND");
+
+                // Process child bundle: bundle with 'Name' is the target
+                if (bundle.ChildrenBundles?.Count > 0)
+                {
+                    string bundleName = bundle.Name;
+                    string childBundlePath = string.Empty;
+                    string workingDirectory = bundleSchema.WorkingDirectory;
+                    string targetArchiveFullPath = string.Empty;
+                    string targetArchiveDestinationFolder = Path.Combine(workingDirectory, bundle.Name.Replace(".tgz", ".dir"));
+
+                    foreach (Bundles child in bundle.ChildrenBundles)
+                    {
+                        if (string.IsNullOrEmpty(childBundlePath))
+                        {
+                            childBundlePath = Path.Combine(workingDirectory, child.Name.Replace(".tgz", ".dir"));
+                        }
+                        else
+                        {
+                            bundleName = child.Name;
+                            childBundlePath = Path.Combine(Path.Combine(childBundlePath, child.Name.Replace(".tgz", ".dir")));
+                            workingDirectory = targetArchiveDestinationFolder;
+                            targetArchiveDestinationFolder = Path.Combine(workingDirectory, bundleName.Replace(".tgz", ".dir"));
+                        }
+
+                        targetArchiveFullPath = Path.Combine(workingDirectory, bundleName);
+                        ExtractTGZ(targetArchiveFullPath, targetArchiveDestinationFolder);
+
+                        // Found the target bundle
+                        if (!string.IsNullOrEmpty(child.Name) && !string.IsNullOrEmpty(child.AuthoritySource))
+                        {
+                            bool usingPackageDirectory = false;
+                            foreach (string signatureFile in child.SignatureFiles)
+                            {
+                                if (!string.IsNullOrEmpty(child.PackageDirectory) && !usingPackageDirectory)
+                                {
+                                    usingPackageDirectory = true;
+                                    targetArchiveDestinationFolder = Path.Combine(targetArchiveDestinationFolder, child.PackageDirectory);
+                                }
+                                string fileToVerify = Path.Combine(targetArchiveDestinationFolder, signatureFile);
+                                string authoritySource = Path.Combine(child.AuthoritySource, signatureFile);
+                                bool fileMatch = File.ReadLines(authoritySource).SequenceEqual(File.ReadLines(fileToVerify));
+                                if (fileMatch)
+                                {
+                                    Console.WriteLine($"  FILE: {Utils.FormatStringAsRequired(signatureFile, filenameSpaceFill, filenameSpaceFillChar)} - MATCH");
+                                    Logger.info($"  FILE: {Utils.FormatStringAsRequired(signatureFile, filenameSpaceFill, filenameSpaceFillChar)} - MATCH");
+                                }
+                                else
+                                {
+                                    Console.WriteLine($"  FILE: {Utils.FormatStringAsRequired(signatureFile, filenameSpaceFill, filenameSpaceFillChar)} - DOES NOT MATCH");
+                                    Logger.info($"  FILE: {Utils.FormatStringAsRequired(signatureFile, filenameSpaceFill, filenameSpaceFillChar)} - DOES NOT MATCH");
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Clean up working directory
+            if (Directory.Exists(bundleSchema.WorkingDirectory))
+            {
+                Directory.Delete(bundleSchema.WorkingDirectory, true);
+            }
+        }
+
+        private static void ExtractTGZ(String gzArchiveName, String destFolder)
+        {
+            try
+            {
+                Stream inStream = File.OpenRead(gzArchiveName);
+                Stream gzipStream = new GZipInputStream(inStream);
+
+                TarArchive tarArchive = TarArchive.CreateInputTarArchive(gzipStream);
+                tarArchive.ExtractContents(destFolder);
+                tarArchive.Close();
+
+                gzipStream.Close();
+                inStream.Close();
+            }
+            catch (Exception e)
+            {
+                Logger.error($"EXCEPTION in BundleProcessing: [{e.Message}]");
+            }
+        }
+
+        private static void StartProgressBar()
+        {
+            DeviceProgressBar = new ProgressBar();
+
+            cursorPositionLeft = Console.CursorLeft;
+            cursorPositionTop = Console.CursorTop;
+
+            // display progress bar
+            Task.Run(async () =>
+            {
+                while (DeviceProgressBar != null)
+                {
+                    DeviceProgressBar.UpdateBar();
+                    await Task.Delay(ProgressBar.TimeDelay);
+                }
+            });
+        }
+
+        private static void StopProgressBar()
+        {
+            if (DeviceProgressBar != null)
+            {
+                DeviceProgressBar.Dispose();
+                DeviceProgressBar = null;
+                Thread.Sleep(TimeDelay);
+                Console.SetCursorPosition(cursorPositionLeft, cursorPositionTop);
+            }
+        }
+    }
+}
