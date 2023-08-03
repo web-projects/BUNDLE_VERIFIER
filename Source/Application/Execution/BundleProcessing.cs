@@ -155,15 +155,38 @@ namespace Application.Execution
         {
             try
             {
-                Stream inStream = File.OpenRead(gzArchiveName);
-                Stream gzipStream = new GZipInputStream(inStream);
+                using (Stream inStream = File.OpenRead(gzArchiveName))
+                using (Stream gzipStream = new GZipInputStream(inStream))
+                using (TarArchive tarArchive = TarArchive.CreateInputTarArchive(gzipStream))
+                {
+                    tarArchive.ExtractContents(destFolder);
+                    tarArchive.Close();
 
-                TarArchive tarArchive = TarArchive.CreateInputTarArchive(gzipStream);
-                tarArchive.ExtractContents(destFolder);
-                tarArchive.Close();
+                    gzipStream.Close();
+                    inStream.Close();
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.error($"EXCEPTION in BundleProcessing: [{e.Message}]");
+            }
+        }
 
-                gzipStream.Close();
-                inStream.Close();
+        private static void CreateTarGZ(string tgzFilename, string fileName)
+        {
+            try
+            {
+                using (var outStream = File.Create(tgzFilename))
+                using (var gzoStream = new GZipOutputStream(outStream))
+                using (var tarArchive = TarArchive.CreateOutputTarArchive(gzoStream))
+                {
+                    tarArchive.RootPath = Path.GetDirectoryName(fileName);
+
+                    var tarEntry = TarEntry.CreateEntryFromFile(fileName);
+                    tarEntry.Name = Path.GetFileName(fileName);
+
+                    tarArchive.WriteEntry(tarEntry, true);
+                }
             }
             catch (Exception e)
             {
