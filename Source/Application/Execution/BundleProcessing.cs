@@ -6,6 +6,9 @@ using Common.LoggerManager;
 using ICSharpCode.SharpZipLib.GZip;
 using ICSharpCode.SharpZipLib.Tar;
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -129,6 +132,14 @@ namespace Application.Execution
                                 {
                                     Console.WriteLine($"  FILE: {Utils.FormatStringAsRequired(signatureFile, filenameSpaceFill, filenameSpaceFillChar)} - DOES NOT MATCH");
                                     Logger.info($"  FILE: {Utils.FormatStringAsRequired(signatureFile, filenameSpaceFill, filenameSpaceFillChar)} - DOES NOT MATCH");
+
+                                    List<string> offenderList = File.ReadLines(fileToVerify).Except(File.ReadLines(authoritySource)).ToList();
+                                    foreach(string offender in offenderList)
+                                    {
+                                        string offenderString = string.Format("\"{0}\"", offender);
+                                        Console.WriteLine($"    OFFENDER: {Utils.FormatStringAsRequired(offenderString, filenameSpaceFill, filenameSpaceFillChar)}");
+                                        Logger.info($"    OFFENDER: {Utils.FormatStringAsRequired(offenderString, filenameSpaceFill, filenameSpaceFillChar)}");
+                                    }
                                 }
                             }
                         }
