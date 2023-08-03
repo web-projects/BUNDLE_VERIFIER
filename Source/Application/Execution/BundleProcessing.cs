@@ -1,14 +1,11 @@
-﻿using BUNDLE_VERIFIER.Config;
-using BundleValidator.Config;
+﻿using BundleValidator.Config;
 using Common.Execution;
 using Common.Helpers;
 using Common.LoggerManager;
 using ICSharpCode.SharpZipLib.GZip;
 using ICSharpCode.SharpZipLib.Tar;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -34,7 +31,7 @@ namespace Application.Execution
             string sourceFilenamePath = Path.Combine(bundleSchema.SourceDirectory, bundleSchema.BundleSource);
 
             // Ensure Source exists
-            if (!File.Exists(sourceFilenamePath)) 
+            if (!File.Exists(sourceFilenamePath))
             {
                 Console.WriteLine($"SOURCE: {sourceFilenamePath} - NOT FOUND\n");
                 Logger.info($"SOURCE: {sourceFilenamePath} - NOT FOUND");
@@ -107,7 +104,7 @@ namespace Application.Execution
                                 string authoritySource = Path.Combine(child.AuthoritySource, signatureFile);
 
                                 // Check file exists in REPO
-                                if (!File.Exists(authoritySource)) 
+                                if (!File.Exists(authoritySource))
                                 {
                                     Console.WriteLine($"  FILE: {Utils.FormatStringAsRequired(authoritySource, filenameSpaceFill, filenameSpaceFillChar)} - NOT FOUND");
                                     Logger.info($"  FILE: {Utils.FormatStringAsRequired(authoritySource, filenameSpaceFill, filenameSpaceFillChar)} - NOT FOUND");
@@ -134,7 +131,7 @@ namespace Application.Execution
                                     Logger.info($"  FILE: {Utils.FormatStringAsRequired(signatureFile, filenameSpaceFill, filenameSpaceFillChar)} - DOES NOT MATCH");
 
                                     List<string> offenderList = File.ReadLines(fileToVerify).Except(File.ReadLines(authoritySource)).ToList();
-                                    foreach(string offender in offenderList)
+                                    foreach (string offender in offenderList)
                                     {
                                         string offenderString = string.Format("\"{0}\"", offender);
                                         Console.WriteLine($"    OFFENDER: {Utils.FormatStringAsRequired(offenderString, filenameSpaceFill, filenameSpaceFillChar)}");
