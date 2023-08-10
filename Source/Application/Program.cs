@@ -2,6 +2,7 @@
 using Application.Execution;
 using BUNDLE_VERIFIER.Config;
 using Common.LoggerManager;
+using Execution;
 using System;
 
 namespace BUNDLE_VERIFIER
@@ -29,6 +30,9 @@ namespace BUNDLE_VERIFIER
                     BundleSource = configuration.Bundles[configuration.Application.ActiveBundleIndex].BundlesSource,
                     Packages = configuration.Bundles[configuration.Application.ActiveBundleIndex].Packages
                 });
+
+                // open log file in Notepad++
+                Processor.OpenNotePadPlus(SetupEnvironment.GetLogFilenamePath());
             }
 
 #if !DEBUG

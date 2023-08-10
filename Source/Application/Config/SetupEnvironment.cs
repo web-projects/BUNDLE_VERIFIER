@@ -14,6 +14,7 @@ namespace Application.Config
 
         private static string sourceDirectory;
         private static string workingDirectory;
+        private static string logfilenamePath;
 
         #region --- APPLICATION ENVIRONMENT ---
         public static AppConfig SetEnvironment()
@@ -42,6 +43,9 @@ namespace Application.Config
         public static string GetWorkingDirectory()
             => workingDirectory;
 
+        public static string GetLogFilenamePath()
+            => logfilenamePath;
+
         private static void ConfigurationLoad()
         {
             // Get appsettings.json config.
@@ -69,7 +73,7 @@ namespace Application.Config
                     string fullName = Assembly.GetEntryAssembly().Location;
                     string logname = Path.GetFileNameWithoutExtension(fullName) + ".log";
                     string path = Directory.GetCurrentDirectory();
-                    string filepath = path + "\\logs\\" + logname;
+                    logfilenamePath = path + "\\logs\\" + logname;
 
                     int levels = 0;
                     foreach (string item in logLevels)
@@ -80,7 +84,7 @@ namespace Application.Config
                         }
                     }
 
-                    Logger.SetFileLoggerConfiguration(filepath, levels);
+                    Logger.SetFileLoggerConfiguration(logfilenamePath, levels);
 
                     Logger.info($"{Assembly.GetEntryAssembly().GetName().Name} ({Assembly.GetEntryAssembly().GetName().Version}) - LOGGING INITIALIZED.");
                 }
