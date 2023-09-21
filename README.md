@@ -27,7 +27,10 @@ This an application to Verify Tar Bundles.
 
 *  AUTO-CONVERTING CRLF line endings into LF
    $ git config --global core.autocrlf true
-   
+
+* GIT LFS TUTORIAL
+  https://github.com/Git-lfs/Git-lfs/wiki/Tutorial
+
 ### HISTORY ###
 
 * 20230801 - Initial repository
