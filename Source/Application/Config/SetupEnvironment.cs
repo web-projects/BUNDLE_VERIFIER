@@ -1,4 +1,5 @@
 ﻿using BUNDLE_VERIFIER.Config;
+using BundleValidator.Config;
 using Common.LoggerManager;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -17,7 +18,7 @@ namespace Application.Config
         private static string logfilenamePath;
 
         #region --- APPLICATION ENVIRONMENT ---
-        public static AppConfig SetEnvironment()
+        public static AppConfig SetEnvironment(RuntimeParams runtimeParams)
         {
             ConfigurationLoad();
 
@@ -25,14 +26,14 @@ namespace Application.Config
             SetLogging();
 
             // Screen Colors
-            SetScreenColors();
+            SetScreenColors(!runtimeParams.InPipeline);
 
             Console.WriteLine($"\r\n==========================================================================================");
             Console.WriteLine($"{Assembly.GetEntryAssembly().GetName().Name} - Version {Assembly.GetEntryAssembly().GetName().Version}");
             Console.WriteLine($"==========================================================================================\r\n");
 
             // Working Directories
-            SetWorkingDirectories();
+            SetWorkingDirectories(runtimeParams);
 
             return configuration;
         }
@@ -95,7 +96,7 @@ namespace Application.Config
             }
         }
 
-        private static void SetScreenColors()
+        private static void SetScreenColors(bool clearConsole)
         {
             if (configuration.Application.EnableColors)
             {
@@ -109,7 +110,10 @@ namespace Application.Config
                     //Console.BackgroundColor = GetColor(configuration.GetSection("Application:Colors").GetValue<string>("BackGround"));
                     Console.BackgroundColor = GetColor(configuration.Application.Colors.BackGround);
 
-                    Console.Clear();
+                    if (clearConsole)
+                    {
+                        Console.Clear();
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -139,15 +143,22 @@ namespace Application.Config
             _ => throw new Exception($"Invalid color identifier '{color}'.")
         };
 
-        static void SetWorkingDirectories()
+        static void SetWorkingDirectories(RuntimeParams runtimeParams)
         {
             string fullName = Assembly.GetEntryAssembly().Location;
             string path = Directory.GetCurrentDirectory();
-            
-            sourceDirectory = path + "\\in\\";
-            if (!Directory.Exists(sourceDirectory)) 
+
+            if (string.IsNullOrEmpty(runtimeParams.BundleDirectory) || !Directory.Exists(runtimeParams.BundleDirectory))
             {
-                Directory.CreateDirectory(sourceDirectory);
+                sourceDirectory = path + "\\in\\";
+                if (!Directory.Exists(sourceDirectory))
+                {
+                    Directory.CreateDirectory(sourceDirectory);
+                }
+            }
+            else
+            {
+                sourceDirectory = runtimeParams.BundleDirectory;
             }
 
             workingDirectory = path + "\\temp\\";

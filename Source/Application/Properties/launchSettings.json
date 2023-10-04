@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "BundleValidator": {
+      "commandName": "Project",
+      "commandLineArgs": "-BundleDir:\"C:\\tmp\\_src\\temp\" -Pipeline:false"
+    }
+  }
+}

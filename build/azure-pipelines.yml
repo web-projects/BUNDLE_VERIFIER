@@ -1,0 +1,69 @@
+# Defined Variables
+# -----------------
+#   configuration: Possible values are [attended, attendednopin, unattended]
+#   device:        Possible values are [M400, P200, P400, UX301]
+#   processor:     Possible values are [CHASE, FDRC, NJT, TSYS]
+#   VipaVersion:   VIPA firmware, 6.8.2.32 as of 2023/09/22
+
+trigger:
+- develop
+
+pool:
+  vmImage: 'windows-2022'
+
+steps:
+- task: PowerShell@2
+  displayName: 'List variables'
+  inputs:
+    filePath: 'build/ListVariables.ps1'
+
+- task: PowerShell@2
+  displayName: 'Download additional resources'
+  name: download
+  inputs:
+    filePath: 'build/DownloadFiles.ps1'
+    pwsh: true          # use pwsh.exe (newer version) instead of powershell.exe
+  env:
+    PAT: $(REPO_PAT)    # Secrets must be passed as environment variables
+
+- task: CmdLine@2
+  displayName: 'List directories'
+  inputs:
+    script: |
+      echo Listing directories...
+      dir $(Agent.BuildDirectory) /b /s | sort
+
+- task: PowerShell@2
+  displayName: 'Create bundle'
+  name: bundle
+  inputs:
+    filePath: 'build/CreateBundle.ps1'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Build BundleVerifier solution'
+  inputs:
+    command: 'build'
+    projects: '$(Agent.BuildDirectory)/_src/BundleVerifier/BundleVerifier.sln'
+    arguments: '--configuration Release'
+
+- task: PowerShell@2
+  displayName: 'Verify bundle'
+  inputs:
+    filePath: 'build/VerifyBundle.ps1'
+    arguments: $(bundle.filename)
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish build artifacts'
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'qa_release_drop'
+    publishLocation: 'Container'
+
+- task: PowerShell@2
+  displayName: 'Upload bundle'
+  inputs:
+    filePath: 'build/UploadBundle.ps1'
+    arguments: $(bundle.filename)
+  env:
+    PAT: $(REPO_PAT)
+  condition: eq(variables['lfsUpload'], 'true')

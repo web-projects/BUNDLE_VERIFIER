@@ -1,6 +1,7 @@
 ﻿using Application.Config;
 using Application.Execution;
 using BUNDLE_VERIFIER.Config;
+using BundleValidator.Config;
 using Common.LoggerManager;
 using Execution;
 using System;
@@ -13,7 +14,13 @@ namespace BUNDLE_VERIFIER
 
         static void Main(string[] args)
         {
-            configuration = SetupEnvironment.SetEnvironment();
+            RuntimeParams runtimeParams = new RuntimeParams();
+            runtimeParams.ParseArguments(args);
+
+            configuration = SetupEnvironment.SetEnvironment(runtimeParams);
+
+            Console.WriteLine($"Runtime parameters: {runtimeParams}");
+            Logger.info($"Runtime parameters: {runtimeParams}");
 
             // Validate Active Index
             if (configuration.Application.ActiveBundleIndex > configuration.Bundles.Count)
@@ -29,26 +36,35 @@ namespace BUNDLE_VERIFIER
                     WorkingDirectory = SetupEnvironment.GetWorkingDirectory(),
                     BundleSource = configuration.Bundles[configuration.Application.ActiveBundleIndex].BundlesSource,
                     Packages = configuration.Bundles[configuration.Application.ActiveBundleIndex].Packages
-                });
+                },
+                !runtimeParams.InPipeline);
 
-                // open log file in Notepad++
-                Processor.OpenNotePadPlus(SetupEnvironment.GetLogFilenamePath());
+                if (!runtimeParams.InPipeline)
+                {
+                    // open log file in Notepad++
+                    Processor.OpenNotePadPlus(SetupEnvironment.GetLogFilenamePath());
+                }
             }
 
 #if !DEBUG
-            Console.WriteLine("\r\n\r\nPress <ENTER> key to exit...");
-
-            ConsoleKeyInfo keypressed = Console.ReadKey(true);
-
-            while (keypressed.Key != ConsoleKey.Enter)
+            if (!runtimeParams.InPipeline)
             {
-                keypressed = Console.ReadKey(true);
-                System.Threading.Thread.Sleep(100);
+                Console.WriteLine("\r\n\r\nPress <ENTER> key to exit...");
+
+                ConsoleKeyInfo keypressed = Console.ReadKey(true);
+
+                while (keypressed.Key != ConsoleKey.Enter)
+                {
+                    keypressed = Console.ReadKey(true);
+                    System.Threading.Thread.Sleep(100);
+                }
             }
 #endif
 
             Console.WriteLine("APPLICATION EXITING ...");
             Console.WriteLine("");
+            
+            Environment.Exit(BundleProcessing.HasError? 1 : 0);
         }
     }
 }

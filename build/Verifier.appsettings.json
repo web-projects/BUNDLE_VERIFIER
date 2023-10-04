@@ -1,0 +1,128 @@
+{
+  "Application": {
+    "Colors": {
+      "ForeGround": "WHITE",
+      "BackGround": "BLACK"
+    },
+    "EnableColors": true,
+    "ActiveBundleIndex": 0
+  },
+  "LoggerManager": {
+    "Logging": {
+      "Levels": "DEBUG|INFO|WARNING|ERROR|FATAL"
+    }
+  },
+  "Bundles": [
+    {
+      "BundlesSource": "[BUNDLE_FILE]",
+      "Packages": [
+        {
+          "Name": "config_hr_mm_ss_reboot-01.00.00.tgz"
+        },
+        {
+          "Name": "config_hr_mm_ss_reboot-01.00.00.tgz.p7s"
+        },
+        {
+          "Name": "idleScreen_m400.tgz"
+        },
+        {
+          "Name": "idleScreen_m400.tgz.p7s"
+        },
+        {
+          "Name": "usr1.VIPA_bin.tgz",
+          "ChildrenPackages": [
+            {
+              "Name": "pkg.bincfg.tgz"
+            },
+            {
+              "Name": "pkg.bincfg.tgz",
+              "SignatureFiles": [
+                "vipa_ver.txt",
+                "vipa_ver.txt.p7s"
+              ],
+              "AuthoritySource": "[DOWNLOAD_DIR]"
+            }
+          ]
+        },
+        {
+          "Name": "usr1.VIPA_cfg.tgz",
+          "ChildrenPackages": [
+            {
+              "Name": "usr1.VIPA_cfg.tgz"
+            },
+            {
+              "Name": "pkg.cfg.tgz",
+              "SignatureFiles": [
+                "#whitelist.dat",
+                "#whitelist.dat.p7s",
+                "cardapp.cfg",
+                "ctdol.cfg",
+                "mapp.cfg",
+                "mapp_prot.cfg",
+                "mapp_vsd_sred.cfg",
+                "tdol.cfg",
+                "trmdol.cfg",
+                "emv_ver.txt",
+                "emv_ver.txt.p7s"
+              ],
+              "AuthoritySource": "[LOCAL_REPO]\\Verifone\\VIPA\\[VERSION_]\\Configurations\\[PROCESSOR]\\CONFIG\\[CONFIGURATION]\\VIPA_cfg"
+            }
+          ]
+        },
+        {
+          "Name": "usr1.VIPA_cfg_emv.tgz",
+          "ChildrenPackages": [
+            {
+              "Name": "usr1.VIPA_cfg.tgz"
+            },
+            {
+              "Name": "pkg.cfgemv.tgz",
+              "SignatureFiles": [
+                "contl_hints.cfg",
+                "contlemv.cfg",
+                "iccdata.dat",
+                "icckeys.key"
+              ],
+              "AuthoritySource": "[LOCAL_REPO]\\Verifone\\VIPA\\[VERSION_]\\Configurations\\[PROCESSOR]\\CONFIG\\[CONFIGURATION]\\VIPA_emv\\cfgemv\\PROD"
+            }
+          ]
+        },
+        {
+          "Name": "usr1.VIPA_www.tgz",
+          "ChildrenPackages": [
+            {
+              "Name": "usr1.VIPA_www.tgz"
+            },
+            {
+              "Name": "pkg.www.tgz",
+              "SignatureFiles": [
+                "display_message.html",
+                "idle.html",
+                "signature.html",
+                "verify_amount.html"
+              ],
+              "PackageDirectory": "www\\mapp",
+              "AuthoritySource": "[DOWNLOAD_DIR]"
+            }
+          ]
+        },
+        {
+          "Name": "usr1.VIPA_www.tgz",
+          "ChildrenPackages": [
+            {
+              "Name": "usr1.VIPA_www.tgz"
+            },
+            {
+              "Name": "pkg.www.tgz",
+              "SignatureFiles": [
+                "eng"
+              ],
+              "PackageDirectory": "www\\mapp\\langs",
+              "AuthoritySource": "[DOWNLOAD_DIR]"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

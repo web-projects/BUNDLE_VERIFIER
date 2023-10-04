@@ -1,0 +1,25 @@
+{
+  "refUpdates": [
+    {
+      "name": "refs/heads/master",
+      "oldObjectId": "[LASTEST_COMMIT_SHA]"
+    }
+  ],
+  "commits": [
+    {
+      "comment": "[COMMIT_COMMENT]",
+      "changes": [
+        {
+          "changeType": "[CHANGE_TYPE]",
+          "item": {
+            "path": "[FILE_PATH]"
+          },
+          "newContent": {
+            "content": "[FILE_CONTENT]",
+            "contentType": "base64encoded"
+          }
+        }
+      ]
+    }
+  ]
+}

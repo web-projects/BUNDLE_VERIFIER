@@ -7,7 +7,10 @@ using ICSharpCode.SharpZipLib.Tar;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
+using System.Text;
+using System.Text.Encodings;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -23,7 +26,9 @@ namespace Application.Execution
         private static int cursorPositionLeft = 0;
         private static int cursorPositionTop = 0;
 
-        public static void ProcessBundles(BundleSchema bundleSchema)
+        public static bool HasError { get; private set; } = false;
+
+        public static void ProcessBundles(BundleSchema bundleSchema, bool deleteWorkingDir)
         {
             Console.WriteLine($"SOURCE: {bundleSchema.BundleSource}\n");
             Logger.info($"SOURCE: {bundleSchema.BundleSource}");
@@ -35,13 +40,15 @@ namespace Application.Execution
             {
                 Console.WriteLine($"SOURCE: {sourceFilenamePath} - NOT FOUND\n");
                 Logger.info($"SOURCE: {sourceFilenamePath} - NOT FOUND");
+                HasError = true;
                 return;
             }
 
             // display progress bar
             StartProgressBar();
 
-            ExtractTGZ(sourceFilenamePath, bundleSchema.WorkingDirectory);
+            // The base bundle has a tgz file extension, but it's actually a tar file.
+            ExtractTGZ(sourceFilenamePath, bundleSchema.WorkingDirectory, true);
 
             StopProgressBar();
 
@@ -52,6 +59,7 @@ namespace Application.Execution
                 {
                     Console.WriteLine($"BUNDLE: {Utils.FormatStringAsRequired(package.Name)} - NOT FOUND");
                     Logger.error($"BUNDLE: {Utils.FormatStringAsRequired(package.Name)} - NOT FOUND");
+                    HasError= true;
                     continue;
                 }
 
@@ -108,6 +116,7 @@ namespace Application.Execution
                                 {
                                     Console.WriteLine($"  FILE: {Utils.FormatStringAsRequired(authoritySource, filenameSpaceFill, filenameSpaceFillChar)} - NOT FOUND");
                                     Logger.info($"  FILE: {Utils.FormatStringAsRequired(authoritySource, filenameSpaceFill, filenameSpaceFillChar)} - NOT FOUND");
+                                    HasError = true;
                                     continue;
                                 }
 
@@ -129,6 +138,7 @@ namespace Application.Execution
                                 {
                                     Console.WriteLine($"  FILE: {Utils.FormatStringAsRequired(signatureFile, filenameSpaceFill, filenameSpaceFillChar)} - DOES NOT MATCH");
                                     Logger.info($"  FILE: {Utils.FormatStringAsRequired(signatureFile, filenameSpaceFill, filenameSpaceFillChar)} - DOES NOT MATCH");
+                                    HasError = true;
 
                                     List<string> offenderList = File.ReadLines(fileToVerify).Except(File.ReadLines(authoritySource)).ToList();
                                     foreach (string offender in offenderList)
@@ -145,24 +155,31 @@ namespace Application.Execution
             }
 
             // Clean up working directory
-            if (Directory.Exists(bundleSchema.WorkingDirectory))
+            if (deleteWorkingDir && Directory.Exists(bundleSchema.WorkingDirectory))
             {
                 Directory.Delete(bundleSchema.WorkingDirectory, true);
             }
         }
 
-        private static void ExtractTGZ(String gzArchiveName, String destFolder)
+        private static void ExtractTGZ(String gzArchiveName, String destFolder, bool? isTarFormat = null)
         {
             try
             {
+                if (!isTarFormat.HasValue)
+                {
+                    isTarFormat = gzArchiveName.EndsWith(".tar", StringComparison.OrdinalIgnoreCase);
+                }
+
+                Encoding encoding = Encoding.UTF8;
+
                 using (Stream inStream = File.OpenRead(gzArchiveName))
-                using (Stream gzipStream = new GZipInputStream(inStream))
-                using (TarArchive tarArchive = TarArchive.CreateInputTarArchive(gzipStream))
+                using (Stream tarStream = isTarFormat.Value ? new TarInputStream(inStream, encoding) : new GZipInputStream(inStream))
+                using (TarArchive tarArchive = TarArchive.CreateInputTarArchive(tarStream, encoding))
                 {
                     tarArchive.ExtractContents(destFolder);
                     tarArchive.Close();
 
-                    gzipStream.Close();
+                    tarStream.Close();
                     inStream.Close();
                 }
             }

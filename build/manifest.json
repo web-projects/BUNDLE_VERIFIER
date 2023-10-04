@@ -1,0 +1,66 @@
+{
+  "remove": [
+    {
+      "name": "0.optim",
+      "path": ".",
+      "type": "directory"
+    }
+  ],
+  "add": [
+    {
+      "name": "config_hr_mm_ss_reboot-01.00.00.tgz",
+      "source": "Platforms/VIPA/SphereArtifacts",
+      "target": "."
+    },
+    {
+      "name": "config_hr_mm_ss_reboot-01.00.00.tgz.p7s",
+      "source": "Platforms/VIPA/SphereArtifacts",
+      "target": "."
+    },
+    {
+      "name": "idleScreen_[DEVICE_L].tgz",
+      "source": "Platforms/VIPA/SphereArtifacts/[DEVICE_U]",
+      "target": "."
+    },
+    {
+      "name": "idleScreen_[DEVICE_L].tgz.p7s",
+      "source": "Platforms/VIPA/SphereArtifacts/[DEVICE_U]",
+      "target": "."
+    },
+    {
+      "name": "eng",
+      "source": "Platforms/VIPA/[VERSION]/SphereArtifacts/usr1.VIPA_www",
+      "target": "usr1.VIPA_www.tgz/usr1.VIPA_www.tar/./pkg.www.tgz/pkg.www.tar/www/mapp/langs"
+    },
+    {
+      "name": "display_message.html",
+      "source": "Platforms/VIPA/[VERSION]/SphereArtifacts/usr1.VIPA_www/[DEVICE_U]/mapp",
+      "target": "usr1.VIPA_www.tgz/usr1.VIPA_www.tar/./pkg.www.tgz/pkg.www.tar/www/mapp"
+    },
+    {
+      "name": "idle.html",
+      "source": "Platforms/VIPA/[VERSION]/SphereArtifacts/usr1.VIPA_www/[DEVICE_U]/mapp",
+      "target": "usr1.VIPA_www.tgz/usr1.VIPA_www.tar/./pkg.www.tgz/pkg.www.tar/www/mapp"
+    },
+    {
+      "name": "signature.html",
+      "source": "Platforms/VIPA/[VERSION]/SphereArtifacts/usr1.VIPA_www/[DEVICE_U]/mapp",
+      "target": "usr1.VIPA_www.tgz/usr1.VIPA_www.tar/./pkg.www.tgz/pkg.www.tar/www/mapp"
+    },
+    {
+      "name": "verify_amount.html",
+      "source": "Platforms/VIPA/[VERSION]/SphereArtifacts/usr1.VIPA_www/[DEVICE_U]/mapp",
+      "target": "usr1.VIPA_www.tgz/usr1.VIPA_www.tar/./pkg.www.tgz/pkg.www.tar/www/mapp"
+    },
+    {
+      "name": "vipa_ver.txt",
+      "source": "Platforms/VIPA/[VERSION]/KIF/[PROCESSOR]/[DEVICE_U]/[CONFIGURATION]",
+      "target": "usr1.VIPA_bin.tgz/usr1.VIPA_bin.tar/./pkg.bincfg.tgz/pkg.bincfg.tar"
+    },
+    {
+      "name": "vipa_ver.txt.p7s",
+      "source": "Platforms/VIPA/[VERSION]/KIF/[PROCESSOR]/[DEVICE_U]/[CONFIGURATION]",
+      "target": "usr1.VIPA_bin.tgz/usr1.VIPA_bin.tar/./pkg.bincfg.tgz/pkg.bincfg.tar"
+    }
+  ]
+}
