@@ -1,7 +1,6 @@
-﻿using BundleValidator.Config;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
-namespace BUNDLE_VERIFIER.Config
+namespace BundleValidator.Config.Bundles
 {
     internal class Bundles
     {

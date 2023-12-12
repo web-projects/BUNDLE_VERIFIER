@@ -1,4 +1,4 @@
-﻿using BundleValidator.Config;
+﻿using BundleValidator.Config.Bundles;
 using System.Collections.Generic;
 
 namespace Application.Execution

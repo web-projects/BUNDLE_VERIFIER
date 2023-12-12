@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using BundleValidator.Config.Bundles;
 
 namespace BUNDLE_VERIFIER.Config
 {

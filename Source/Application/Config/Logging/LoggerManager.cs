@@ -1,4 +1,6 @@
-﻿namespace Application.Config.Logging
+﻿using Application.Config.Logging;
+
+namespace BUNDLE_VERIFIER.Config
 {
     internal class LoggerManager
     {

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace BundleValidator.Config
+namespace BundleValidator.Config.Bundles
 {
     internal class Packages
     {

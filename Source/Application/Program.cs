@@ -49,21 +49,11 @@ namespace BUNDLE_VERIFIER
 #if !DEBUG
             if (!runtimeParams.InPipeline)
             {
-                Console.WriteLine("\r\n\r\nPress <ENTER> key to exit...");
-
-                ConsoleKeyInfo keypressed = Console.ReadKey(true);
-
-                while (keypressed.Key != ConsoleKey.Enter)
-                {
-                    keypressed = Console.ReadKey(true);
-                    System.Threading.Thread.Sleep(100);
-                }
+                // Wait for key press to exit
+                SetupEnvironment.WaitForExitKeyPress();
             }
 #endif
 
-            Console.WriteLine("APPLICATION EXITING ...");
-            Console.WriteLine("");
-            
             Environment.Exit(BundleProcessing.HasError? 1 : 0);
         }
     }

@@ -2,6 +2,16 @@
 
 namespace Common.LoggerManager
 {
+    public enum LogLevel
+    {
+        Trace = 0,
+        Debug = 1,
+        Info = 2,
+        Warn = 3,
+        Error = 4,
+        Critical = 5,
+    }
+
     public enum LOGLEVELS
     {
         NONE = 0x00,
@@ -11,6 +21,7 @@ namespace Common.LoggerManager
         ERROR = 0x08,
         FATAL = 0x10
     }
+    
     public static class LogLevels
     {
         public static Dictionary<LOGLEVELS, string> LogLevelsDictonary = new Dictionary<LOGLEVELS, string>()

@@ -11,6 +11,7 @@ namespace Execution
         {
             try
             {
+                // throws an exception if the extension is not associated with NotePad++
                 if (File.Exists(filenamePath))
                 {
                     Process process = new Process();

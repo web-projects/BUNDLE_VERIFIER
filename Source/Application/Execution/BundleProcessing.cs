@@ -1,4 +1,4 @@
-﻿using BundleValidator.Config;
+﻿using BundleValidator.Config.Bundles;
 using Common.Execution;
 using Common.Helpers;
 using Common.LoggerManager;
@@ -7,10 +7,8 @@ using ICSharpCode.SharpZipLib.Tar;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
 using System.Text;
-using System.Text.Encodings;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -25,6 +23,9 @@ namespace Application.Execution
         private static ProgressBar DeviceProgressBar = null;
         private static int cursorPositionLeft = 0;
         private static int cursorPositionTop = 0;
+
+        // this indicates that the bundle doesn't need unarchiving and only the authority source changes
+        private static string twinBundle = "AUTHORITY_SOURCE_CHANGED";
 
         public static bool HasError { get; private set; } = false;
 
@@ -48,9 +49,15 @@ namespace Application.Execution
             StartProgressBar();
 
             // The base bundle has a tgz file extension, but it's actually a tar file.
-            ExtractTGZ(sourceFilenamePath, bundleSchema.WorkingDirectory, true);
+            bool extracted = ExtractArchive(sourceFilenamePath, bundleSchema.WorkingDirectory, true);
 
             StopProgressBar();
+
+            if (!extracted)
+            {
+                Console.WriteLine("Failed to extract archive!\r\n");
+                return;
+            }
 
             foreach (Packages package in bundleSchema.Packages)
             {
@@ -59,7 +66,7 @@ namespace Application.Execution
                 {
                     Console.WriteLine($"BUNDLE: {Utils.FormatStringAsRequired(package.Name)} - NOT FOUND");
                     Logger.error($"BUNDLE: {Utils.FormatStringAsRequired(package.Name)} - NOT FOUND");
-                    HasError= true;
+                    HasError = true;
                     continue;
                 }
 
@@ -77,24 +84,44 @@ namespace Application.Execution
 
                     foreach (Packages child in package.ChildrenPackages)
                     {
+                        bool unarchiveChild = true;
+
                         if (string.IsNullOrEmpty(childBundlePath))
                         {
                             childBundlePath = Path.Combine(workingDirectory, child.Name.Replace(".tgz", ".dir"));
                         }
                         else
                         {
-                            bundleName = child.Name;
-                            childBundlePath = Path.Combine(Path.Combine(childBundlePath, child.Name.Replace(".tgz", ".dir")));
-                            workingDirectory = targetArchiveDestinationFolder;
-                            targetArchiveDestinationFolder = Path.Combine(workingDirectory, bundleName.Replace(".tgz", ".dir"));
+                            // Check for a bundle that changes authority source
+                            if (string.Compare(child.Name, twinBundle, StringComparison.OrdinalIgnoreCase) == 0)
+                            {
+                                unarchiveChild = false;
+                            }
+                            else
+                            {
+                                bundleName = child.Name;
+                                string targetReplacement = bundleName.Contains("tgz") ? ".tgz" : ".tar";
+                                childBundlePath = Path.Combine(Path.Combine(childBundlePath,
+                                    child.Name.Replace(targetReplacement, ".dir")));
+                                workingDirectory = targetArchiveDestinationFolder;
+                                targetArchiveDestinationFolder = Path.Combine(workingDirectory, 
+                                    bundleName.Replace(targetReplacement, ".dir"));
+                            }
                         }
 
-                        targetArchiveFullPath = Path.Combine(workingDirectory, bundleName);
-
-                        // Check for directory since some steps are only validating a file in a different subdirectory
-                        if (!Directory.Exists(targetArchiveDestinationFolder))
+                        if (unarchiveChild)
                         {
-                            ExtractTGZ(targetArchiveFullPath, targetArchiveDestinationFolder);
+                            targetArchiveFullPath = Path.Combine(workingDirectory, bundleName);
+
+                            // Check for directory since some steps are only validating a file in a different subdirectory
+                            if (!Directory.Exists(targetArchiveDestinationFolder))
+                            {
+                                if (!ExtractArchive(targetArchiveFullPath, targetArchiveDestinationFolder))
+                                {
+                                    Console.WriteLine("Failed to extract archive!\r\n");
+                                    return;
+                                }
+                            }
                         }
 
                         // Found the target bundle
@@ -161,8 +188,9 @@ namespace Application.Execution
             }
         }
 
-        private static void ExtractTGZ(String gzArchiveName, String destFolder, bool? isTarFormat = null)
+        private static bool ExtractArchive(String gzArchiveName, String destFolder, bool? isTarFormat = null)
         {
+            bool extracted = false;
             try
             {
                 if (!isTarFormat.HasValue)
@@ -182,11 +210,14 @@ namespace Application.Execution
                     tarStream.Close();
                     inStream.Close();
                 }
+                extracted = true;
             }
             catch (Exception e)
             {
                 Logger.error($"EXCEPTION in BundleProcessing: [{e.Message}]");
             }
+
+            return extracted;
         }
 
         private static void CreateTarGZ(string tgzFilename, string fileName)
