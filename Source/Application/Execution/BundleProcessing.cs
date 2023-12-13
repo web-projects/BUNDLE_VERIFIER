@@ -1,4 +1,5 @@
 ﻿using BundleValidator.Config.Bundles;
+using BundleValidator.Execution;
 using Common.Execution;
 using Common.Helpers;
 using Common.LoggerManager;
@@ -104,7 +105,7 @@ namespace Application.Execution
                                 childBundlePath = Path.Combine(Path.Combine(childBundlePath,
                                     child.Name.Replace(targetReplacement, ".dir")));
                                 workingDirectory = targetArchiveDestinationFolder;
-                                targetArchiveDestinationFolder = Path.Combine(workingDirectory, 
+                                targetArchiveDestinationFolder = Path.Combine(workingDirectory,
                                     bundleName.Replace(targetReplacement, ".dir"));
                             }
                         }
@@ -156,6 +157,7 @@ namespace Application.Execution
                                 }
 
                                 bool fileMatch = File.ReadLines(authoritySource).SequenceEqual(File.ReadLines(fileToVerify));
+
                                 if (fileMatch)
                                 {
                                     Console.WriteLine($"  FILE: {Utils.FormatStringAsRequired(signatureFile, filenameSpaceFill, filenameSpaceFillChar)} - MATCH");
@@ -163,6 +165,8 @@ namespace Application.Execution
                                 }
                                 else
                                 {
+                                    DeepAnalyzeFailure(authoritySource, fileToVerify);
+
                                     Console.WriteLine($"  FILE: {Utils.FormatStringAsRequired(signatureFile, filenameSpaceFill, filenameSpaceFillChar)} - DOES NOT MATCH");
                                     Logger.info($"  FILE: {Utils.FormatStringAsRequired(signatureFile, filenameSpaceFill, filenameSpaceFillChar)} - DOES NOT MATCH");
                                     HasError = true;
@@ -240,6 +244,17 @@ namespace Application.Execution
             {
                 Logger.error($"EXCEPTION in BundleProcessing: [{e.Message}]");
             }
+        }
+
+        private static void DeepAnalyzeFailure(string authoritySource, string fileToVerify)
+        {
+#if DEBUG
+            IEnumerableComparer<string> comparer = new IEnumerableComparer<string>();
+            IEnumerable<string> source = File.ReadLines(authoritySource);
+            IEnumerable<string> target = File.ReadLines(fileToVerify);
+
+            comparer.Equals(source, target);
+#endif
         }
 
         private static void StartProgressBar()
