@@ -41,16 +41,16 @@ function Create-Directory
 function Initialize-Variables
 {
   # Local overrides
-  #$script:localRepoDir = "C:\git\EMVConfiguration"
-  #$script:configuration = "attended"
-  #$script:device = "M400"
-  #$script:processor = "CHASE"
-  #$script:vipaVersion = "6.8.2.32"
-  #$script:stagingDir = "C:\tmp\_src\temp"
-  #$script:baseBundle = "VIPA_$($vipaVersion)_$($device)_release_install_sphere.tgz"
-  #$script:downloadDir = "C:\tmp\_src"
-  #$script:bundleDir = "$downloadDir\bundle"
-  #$script:tempDir = "$downloadDir\temp"
+  $script:localRepoDir = "C:\git\EMVConfiguration"
+  $script:configuration = "attendednopin"
+  $script:device = "P200"
+  $script:processor = "FDRC"
+  $script:vipaVersion = "6.8.2.32"
+  $script:stagingDir = "C:\tmp\_src\temp"
+  $script:baseBundle = "VIPA_$($vipaVersion)_$($device)_release_install_sphere.tgz"
+  $script:downloadDir = "C:\tmp\_src"
+  $script:bundleDir = "$downloadDir\bundle"
+  $script:tempDir = "$downloadDir\temp"
   
   $script:manifest = Get-Content -Path "$PSScriptRoot\manifest.json" | Out-String | ConvertFrom-Json
   

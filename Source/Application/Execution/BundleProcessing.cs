@@ -30,7 +30,7 @@ namespace Application.Execution
 
         public static bool HasError { get; private set; } = false;
 
-        public static void ProcessBundles(BundleSchema bundleSchema, bool deleteWorkingDir)
+        public static void ProcessBundles(BundleSchema bundleSchema, bool notInPipeline)
         {
             Console.WriteLine($"SOURCE: {bundleSchema.BundleSource}\n");
             Logger.info($"SOURCE: {bundleSchema.BundleSource}");
@@ -45,14 +45,19 @@ namespace Application.Execution
                 HasError = true;
                 return;
             }
-
-            // display progress bar
-            StartProgressBar();
+            if (notInPipeline)
+            {
+                // display progress bar
+                StartProgressBar();
+            }
 
             // The base bundle has a tgz file extension, but it's actually a tar file.
             bool extracted = ExtractArchive(sourceFilenamePath, bundleSchema.WorkingDirectory, true);
 
-            StopProgressBar();
+            if (notInPipeline)
+            {
+                StopProgressBar();
+            }
 
             if (!extracted)
             {
@@ -186,7 +191,7 @@ namespace Application.Execution
             }
 
             // Clean up working directory
-            if (deleteWorkingDir && Directory.Exists(bundleSchema.WorkingDirectory))
+            if (notInPipeline && Directory.Exists(bundleSchema.WorkingDirectory))
             {
                 Directory.Delete(bundleSchema.WorkingDirectory, true);
             }
