@@ -144,6 +144,15 @@ namespace Application.Execution
                                 string fileToVerify = Path.Combine(targetArchiveDestinationFolder, signatureFile);
                                 string authoritySource = Path.Combine(child.AuthoritySource, signatureFile);
 
+                                // check the file is in the bundle
+                                if (!File.Exists(fileToVerify))
+                                {
+                                    Console.WriteLine($"  FILE: {Utils.FormatStringAsRequired(fileToVerify, filenameSpaceFill, filenameSpaceFillChar)} - NOT FOUND");
+                                    Logger.info($"  FILE: {Utils.FormatStringAsRequired(fileToVerify, filenameSpaceFill, filenameSpaceFillChar)} - NOT FOUND");
+                                    HasError = true;
+                                    continue;
+                                }
+
                                 // Check file exists in REPO
                                 if (!File.Exists(authoritySource))
                                 {
@@ -161,7 +170,7 @@ namespace Application.Execution
                                     continue;
                                 }
 
-                                bool fileMatch = File.ReadLines(authoritySource).SequenceEqual(File.ReadLines(fileToVerify));
+                                bool fileMatch = ReadLines(authoritySource).SequenceEqual(ReadLines(fileToVerify));
 
                                 if (fileMatch)
                                 {
@@ -176,7 +185,7 @@ namespace Application.Execution
                                     Logger.info($"  FILE: {Utils.FormatStringAsRequired(signatureFile, filenameSpaceFill, filenameSpaceFillChar)} - DOES NOT MATCH");
                                     HasError = true;
 
-                                    List<string> offenderList = File.ReadLines(fileToVerify).Except(File.ReadLines(authoritySource)).ToList();
+                                    List<string> offenderList = ReadLines(fileToVerify).Except(ReadLines(authoritySource)).ToList();
                                     foreach (string offender in offenderList)
                                     {
                                         string offenderString = string.Format("\"{0}\"", offender);
@@ -193,7 +202,31 @@ namespace Application.Execution
             // Clean up working directory
             if (notInPipeline && Directory.Exists(bundleSchema.WorkingDirectory))
             {
-                Directory.Delete(bundleSchema.WorkingDirectory, true);
+                try
+                {
+                    Directory.Delete(bundleSchema.WorkingDirectory, true);
+                }
+                catch (Exception e)
+                {
+                    Logger.error($"EXCEPTION in BundleProcessing: [{e.Message}]");
+                }
+            }
+        }
+
+        public static IEnumerable<string> ReadLines(string filename)
+        {
+            return ReadLines(() => File.OpenText(filename));
+        }
+
+        private static IEnumerable<string> ReadLines(Func<TextReader> readerProvider)
+        {
+            using (var reader = readerProvider())
+            {
+                string line;
+                while ((line = reader.ReadLine()) != null)
+                {
+                    yield return line;
+                }
             }
         }
 
@@ -255,8 +288,9 @@ namespace Application.Execution
         {
 #if DEBUG
             IEnumerableComparer<string> comparer = new IEnumerableComparer<string>();
-            IEnumerable<string> source = File.ReadLines(authoritySource);
-            IEnumerable<string> target = File.ReadLines(fileToVerify);
+
+            IEnumerable<string> source = ReadLines(authoritySource);
+            IEnumerable<string> target = ReadLines(fileToVerify);
 
             comparer.Equals(source, target);
 #endif
