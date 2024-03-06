@@ -17,7 +17,7 @@ namespace Application.Execution
 {
     internal static class BundleProcessing
     {
-        private const int filenameSpaceFill = 20;
+        private const int filenameSpaceFill = 27;
         private const char filenameSpaceFillChar = ' ';
         private const int TimeDelay = 1000;
 
